@@ -1,0 +1,311 @@
+<html>
+<head>
+<title>Game base for Android and Apple</title>
+
+
+<script> 
+//Global variables here
+
+myBgPosY = 0;     // present vertical position
+myBgPosX = 0;    // present horizonal position
+myBgHeight = 402;    // height of background image
+myBgWidth = 753;  // width of background image
+myBgSpeedYdown = 1;    // speed moving down 
+myBgSpeedXright = 0;    // speed moving right
+
+
+
+<!-- ********************  Background Scrolling **************************  -->
+
+// myScroll function controls the moving of the background image
+
+function myScroll() {
+
+   myAuto()
+   checkAll()
+
+
+   myBgPosY +=  myBgSpeedYdown;
+   if (myBgPosY > myBgHeight) {myBgPosY = 0}
+   if (myBgPosY <0) {myBgPosY = myBgHeight}
+
+   myBgPosX +=  myBgSpeedXright;
+   if (myBgPosX > myBgWidth) {myBgPosX = 0}
+   if (myBgPosX <0) {myBgPosX = myBgWidth}
+
+
+   myBgObject.style.backgroundPosition = myBgPosX+" " + myBgPosY;
+}
+
+
+
+
+<!-- ********************  Object Detection Starts below **************************  -->
+
+// myHitXY function determines if any object has hit an x, y location. Note it is better to use the myHitOther function
+ 
+function myHitXY(my1,X,Y){
+
+   left1  = parseInt(document.getElementById(my1).style.left)
+   right1   = left1 + parseInt(document.getElementById(my1).style.width)
+
+   top1    = parseInt(document.getElementById(my1).style.top)   
+   bottom1 = top1   + parseInt(document.getElementById(my1).style.height)
+
+   document.getElementById('myShowDiv1').innerHTML = right1  +', '+ left1  +', '+   top1   +', '+  bottom1
+
+   if ((left1   <= X ) &&      	   
+       (right1  >= X ) &&
+       (top1    <= Y ) &&
+       (bottom1 >= Y ) ){
+       return true
+   }
+}
+
+
+
+// myHitOther function determines if two obejcts have hit each other. 
+
+function myHitOther(my1,my2){
+
+
+   left1   = parseInt(document.getElementById(my1).style.left)
+   right1  = left1 + parseInt(document.getElementById(my1).style.width)
+   top1    = parseInt(document.getElementById(my1).style.top)   
+   bottom1 = top1   + parseInt(document.getElementById(my1).style.height)
+
+
+   left2   = parseInt(document.getElementById(my2).style.left)
+   right2  = left2 + parseInt(document.getElementById(my2).style.width)
+   top2    = parseInt(document.getElementById(my2).style.top)   
+   bottom2 = top2   + parseInt(document.getElementById(my2).style.height)
+
+
+
+   if ((right1  >=  left2  ) &&      	   
+       (bottom1 >=  top2   ) &&
+       (left1   <=  right2 ) &&
+       (top1    <=  bottom2) ){
+       return true
+   }
+}
+
+
+
+// Group all your detection code here
+ 
+function checkAll(){
+ 
+  if (myHitXY('move1',200,280)) {
+    document.getElementById('myShowDiv3').innerHTML = 'You hit the red dot'
+  } else {document.getElementById('myShowDiv3').innerHTML = ''}
+ 
+  if (myHitOther('move1','move2')) {
+      document.getElementById('myShowDiv3').innerHTML = 'You hit object move2'
+  }
+
+
+  if (myHitOther('bullet1','move2')) {
+      document.getElementById('myShowDiv3').innerHTML = 'The bullet hit move 2'
+      document.getElementById('bullet1').style.visibility  = 'hidden'
+      document.getElementById('bullet1').style.left  = '-200px'
+      clearInterval(document.myShot)
+
+  }
+
+
+
+
+
+
+
+// just shows where your two objects are to help with debugging
+
+   document.getElementById('myShowDiv1').innerHTML = left1  +', '+ right1  +', '+   top1   +', '+  bottom1
+   document.getElementById('myShowDiv2').innerHTML = left2  +', '+ right2  +', '+   top2   +', '+  bottom2
+
+}
+ 
+
+ 
+
+
+<!-- ********************  Object Detection  finished **************************  -->
+<!-- ********************  Object Motion Below **************************  -->
+
+
+
+
+document.mySpeedX = 0;
+document.mySpeedY = 0;
+
+function myAuto(){
+
+  if(parseInt(document.getElementById('move1').style.left) > window.innerWidth - document.getElementById('move1').width){
+       document.mySpeedX *= -1
+   }
+
+  document.getElementById('move1').style.left = parseInt(document.getElementById('move1').style.left)+document.mySpeedX+'px'
+  document.getElementById('move1').style.top  = parseInt(document.getElementById('move1').style.top)+document.mySpeedY+'px'
+
+}
+
+
+function myGunPrep(){
+
+    document.getElementById('bullet1').style.visibility  = 'visible'
+    document.getElementById('bullet1').style.left  = document.getElementById('move1').style.left
+    document.getElementById('bullet1').style.top   = document.getElementById('move1').style.top
+    
+   clearInterval(document.myShot)
+   document.myShot = setInterval('myGun()', 100) // calls the function every 30 mille seconds
+
+}
+
+
+function myGun(){
+
+    document.getElementById('bullet1').style.left  = parseInt(document.getElementById('bullet1').style.left) + 20 + 'px'
+
+}
+
+
+</script>
+
+</head>
+
+
+
+<!-- ********************  Here the webpage begins **************************  -->
+
+
+
+
+<!-- ********************  onkeypress just for webpages is useless on mobile apps **************************  -->
+
+<body background="data:image/jpeg;base64,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" onload="myTimer = setInterval('myScroll()', 100)"    onkeypress="{
+	if(event.keyCode==97){document.mySpeedX += -4}   // small a key
+	if(event.keyCode==119){document.mySpeedY += 6}   // small w key
+	if(event.keyCode==100){alert(you typed the letter d)}   // small d key
+}">
+
+
+<script>        // This object must be after the body tag
+
+myBgObject = eval('document.body');
+
+</script>
+
+
+
+
+
+
+<h2 align=center  style="background-color:yellow"> Game Base by Leo</h2>
+
+
+
+<!-- ********************  Some instructions that magically disappear **************************  -->
+
+<div id="myInstructions" onclick="document.getElementById('myInstructions').style.visibility = 'hidden'" style="visibility:visible; width:500px; background-color:yellow">
+<ol>Instructions here:
+<li> Make you own game
+<li> For this demonstration. click the buttons and the red box
+<li> Delete the buttons you do not want in your game.
+<li> Look at the code for each button to see how to make buttons for other directions
+</ol>
+Click to hide.
+</div><br>
+ 
+
+
+
+
+
+
+<!-- ********************  Following should be all your images **************************  -->
+
+
+
+<img  id="move1"  src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQC9n4SseYJeBgkFCWMF96cnE0QZGf2uOy2Vb9MmM6xvcZCnmxz&usqp=CAU"  style="position:absolute; width:30px; height:30px; left:30px; top:250px" onClick="myGunPrep()">  
+ 
+<img  id="move2"  src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQC9n4SseYJeBgkFCWMF96cnE0QZGf2uOy2Vb9MmM6xvcZCnmxz&usqp=CAU" style="position:absolute; width:30px; height:30px;  left:500px; top:240px;"/>
+
+
+
+<input type=button value="Fire" onClick="myGunPrep()">
+
+
+<img  id="bullet1" src="myImgNew.jpg" style="position:absolute; width:10px; height:10px;  left:500px; top:240px; visibility:hidden"/>
+
+
+
+
+<!-- ******************** This is the silly little dot the main object hits **************************  -->
+
+<h1 style="position:absolute;left:200px;top:230px;"><font color=red>.</font></h1>
+ 
+
+
+
+
+
+
+
+<!-- ********************  Now all the buttons. Note: ontouchstart is faster than onclick  **************************  -->
+
+
+<input type=button value="BG Faster Down" onClick="myBgSpeedYdown += 1">
+
+<input type=button value="Bg Faster Right" onClick="myBgSpeedXright += 1">
+
+
+
+
+
+<input type=button value="Step Right" onclick="{
+    document.getElementById('move1').style.left  = parseInt(document.getElementById('move1').style.left)+5+'px'
+    checkAll()
+}">
+
+
+<input type=button value="touch event Right" ontouchstart="{
+    document.getElementById('move1').style.left  = parseInt(document.getElementById('move1').style.left)+5+'px'
+    checkAll()
+}">
+
+
+
+
+
+ 
+
+<input type=button value="Auto Down" onClick="{ 
+   document.mySpeedY += 6
+}">
+
+
+<input type=button value="Auto Right" onClick="{
+   document.mySpeedX  +=  4
+
+}"> 
+
+
+
+<!-- ********************  General game output **************************  -->
+
+
+<div id="myShowDiv1" style="width:300px; background-color:yellow">out 1</div>
+<div id="myShowDiv2" style="width:300px; background-color:yellow">out 2</div>
+<div id="myShowDiv3" style="width:300px; background-color:yellow">out 3</div>
+
+
+
+
+<br>At the bottom of every page make sure you include the following button:<br>
+
+<input type=button value="Back" style="font-size:25px" onclick="{window.history.back()}"><br><br>
+
+
+</body>
+</html>
